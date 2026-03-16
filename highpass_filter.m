@@ -1,17 +1,15 @@
-%=========================================================================%
-% The formula for a sine wave is :
-% 
-% y = A sin (ωt + φ)
-% 
-% Where:
-% y is the instantaneous value of the wave
-% A is the amplitude of the wave
-% ω is the angular frequency of the wave, which is equal to 2π times
-%   the frequency f of the wave, i.e., ω = 2πf
-% t is the time
-% φ is the phase angle of the wave, which represents the offset of the wave 
-%   from a reference position at t = 0.
-%=========================================================================%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% High-Pass FIR Filter Design and Signal Filtering
+%
+% Generates three sine waves (10 Hz, 100 Hz, 500 Hz), mixes them, then
+% applies a high-pass FIR filter (via convolution) to isolate the 500 Hz
+% component and remove low-frequency content.
+%
+% Filter Specs:  fs = 2000 Hz  |  fc = 400 Hz  |  Order: 100  |  Type: High-Pass FIR
+%
+% Author: Mohamed GALY
+% Date: 2026
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %============================= HouseKeeping ==============================%
 clc;        % clear command window
 close all;  % close all figures
@@ -20,52 +18,37 @@ workspace;  % make sure workspace is open
 %=========================================================================%
 
 %============================= Format Setting ============================%
-% format long g ensures precise numerical results, format compact reduces
-%        blank lines between the outputs for a cleaner display.
-format long g   % Display numbers with up to 15 significant digits,
-                % in fixed-point or scientific notation.
-format compact  % Reduce vertical spacing in the command window output
-                % for a more compact display.
-% set the font size
-fontsize = 2;
+format long g   % 15 significant digits, fixed-point or scientific
+format compact  % reduce vertical spacing in output
+fontsize = 2;   % figure font size scale
 %=========================================================================%
 
 %========================== Generating-signal ============================%
-% 0: The starting value of the sequence.
-% 1/2000: The step size (increment) between consecutive values in the 
-% sequence. i.e : t = [0, 0.0005, 0.001, 0.0015, ..., 0.4995, 0.5]
-% 0.5 End The sequence stops at or just before 0.5.
-% Generate a time vector from 0 to 0.5 with a step size of 1/2000.
-% Total number of elements = (End - Start) / Step size + 1
-                         % = (0.5 - 0) / (1/2000) + 1 = 1001 elements.
-% 1/2000 sample: 2000 times sample in 1 second (2KHz sampling rates)
+% Time vector: 0 to 0.5 s at fs = 2000 Hz → 1001 samples
 t = 0 : 1/2000 : 0.5;
 %=========================================================================%
 
 %========================== Define the wave parameters ===================%
 %================================== Signal-1 =============================%
-f1 = 10; % 10hz
-T1 = 1/f1; % period of the signal 1/freq1
-amp1 = 1; % define the amplitude of the signal
+f1 = 10;    % 10 Hz
+T1 = 1/f1;  % period
+amp1 = 1;   % amplitude
 
 %================================== Signal-2 =============================%
-f2 = 100; % 100hz
-T2 = 1/f2; % period of the signal 1/freq2
-amp2 = 1; % define the amplitude of the signal
+f2 = 100;   % 100 Hz
+T2 = 1/f2;  % period
+amp2 = 1;   % amplitude
 
 %================================== Signal-3 =============================%
-f3 = 500; % 100hz
-T3 = 1/f3; % period of the signal 1/freq3
-amp3 = 1; % define the amplitude of the signal
+f3 = 500;   % 500 Hz
+T3 = 1/f3;  % period
+amp3 = 1;   % amplitude
 %=========================================================================%
 
 %========================== Create the signals ===========================%
-%Create signal 1 
-signal1 = amp1 * sin(2*pi*t/T1);
-%Create signal 2 
-signal2 = amp3 * sin(2*pi*t/T2);
-%Create signal 3
-signal3 = amp2 * sin(2*pi*t/T3);
+signal1 = amp1 * sin(2*pi*t/T1); % 10 Hz
+signal2 = amp3 * sin(2*pi*t/T2); % 100 Hz
+signal3 = amp2 * sin(2*pi*t/T3); % 500 Hz
 %=========================================================================%
 
 %========================== Mixing the signals ===========================%
@@ -79,12 +62,10 @@ Mixsignal = signal1+ signal2+ signal3;
 %plot(t,Mixsignal)
 %=========================================================================%
 
-%========= Creating a 101 High-pass filter of cutoff frequency 400Hz =====%
-%Sampling rate of the signal is 2000Hz (2Kh)
-%fir1(kernel_lenght-1, cutoffFreq/samplingRateFreq)
-fc = 400;   %cuttoff frequency
-fs = 2000; %sampling rate frequency
-h = fir1(100,fc/fs,'high'); % Impulse response
+%========= Creating a 101-tap High-Pass FIR filter (fc = 400 Hz) ========%
+fc = 400;  % cutoff frequency [Hz]
+fs = 2000; % sampling frequency [Hz]
+h = fir1(100, fc/fs, 'high'); % FIR impulse response (101 taps)
 L = length(h);
 %plot(h);
 %freqz(h);
@@ -110,5 +91,5 @@ plot(filterSig,'g.-','LineWidth',1,'MarkerSize',1);
 title('Filtered Signal');
 %=========================================================================%
 
-%Save filter kernel to csv
-csvwrite('Highpass_Filter_fc_400Hz.txt',h);
+% Save filter kernel (fc = 400 Hz) to CSV
+csvwrite('Highpass_Filter_fc_400Hz.txt', h);

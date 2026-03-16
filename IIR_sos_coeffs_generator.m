@@ -1,19 +1,21 @@
-% ======================================================================= % 
-% IRR second order structure SOS This function take two arguments 
-% SOS & GAIN Matraix. : irrsos_coeffs_gen_for_armFun(SOS,G)
-% The output is Producing a (.h file) that contains the filter coefficients
-% in the [arm form array] + define to the filter gain and the number of
-% sections of the generated filter ready to use in C.
-% ======================================================================= %
-
-% This function generates a C header file with filter coefficients
-% from a given second-order-section (SOS) matrix and gain.
-% It includes the gain in the filter coefficients and outputs a .h file.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Function: irrsos_coeffs_gen_for_armFun
 %
-% Arguments:
-%   SOS  - Second-order-section matrix [num_sections x 6]
-%   gain - Gain value (scalar or vector) to apply across all sections
-    
+% Generates a C header (.h) file with IIR SOS coefficients formatted for
+% the ARM CMSIS-DSP library. Each section is exported as:
+%   [b0, b1, b2, -a1, -a2]
+%
+% Inputs:
+%   SOS   : SOS matrix [num_sections × 6]  —  format: [b0 b1 b2 a0 a1 a2]
+%   gain  : Filter gain (scalar or vector);  total = prod(gain)
+%
+% Output:
+%   C header (.h) with FILTER_GAIN, NUM_SECTIONS, and pCoeffs[] definitions
+%
+% Author: Mohamed GALY
+% Date: 2026
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function irrsos_coeffs_gen_for_armFun(SOS, gain)
 
     % Validate input arguments
